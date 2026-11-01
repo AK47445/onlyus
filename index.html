@@ -4,11 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OnlyUs">
-</head>
-<body>
+<meta name="theme-color" content="#070b1a">
+<meta name="robots" content="noindex, nofollow">
 <title>OnlyUs</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Figtree:wght@400;500;600;700&family=Permanent+Marker&display=swap">
 <style>
 :root{
   /* India x El Salvador: saffron + green from the tiranga, cobalt blue + white from la azul y blanco */
@@ -276,6 +281,21 @@ h1 span{text-shadow:0 0 22px rgba(0,175,240,.35)}
   font-weight:600;
   padding:48px 16px;
 }
+.export-row{display:flex; flex-direction:column; align-items:center; gap:6px; padding-top:28px}
+.export-link{
+  appearance:none;
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--muted);
+  font-size:.82rem;
+  font-weight:600;
+  padding:8px 14px;
+  border-radius:999px;
+  cursor:pointer;
+}
+.export-link:hover{color:var(--fg); border-color:var(--violet)}
+.export-link:disabled{opacity:.6; cursor:default}
+.export-status{font-size:.78rem; color:var(--muted)}
 .share-note{
   text-align:center;
   color:var(--muted);
@@ -405,10 +425,40 @@ h1 span{text-shadow:0 0 22px rgba(0,175,240,.35)}
 }
 .confirm-box p{font-size:.9rem; color:var(--fg)}
 .form-error{color:var(--pink); font-size:.88rem}
-</style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Figtree:wght@400;500;600;700&family=Permanent+Marker&display=swap">
 
+/* ---- Firebase version extras ---- */
+.gate{
+  margin:28px auto 0;
+  max-width:360px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  background:color-mix(in srgb, var(--bg-panel) 85%, transparent);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:26px 20px;
+}
+.gate-title{font-family:var(--font-hand); color:var(--pink); font-size:1.5rem}
+.gate-sub{color:var(--muted); font-size:.95rem; line-height:1.45}
+.gate code{color:var(--fg); background:var(--bg-panel-2); padding:1px 6px; border-radius:6px; font-size:.85em}
+.google-btn{
+  background:#fff;
+  color:#1f1f1f;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+.google-btn svg{width:20px; height:20px}
+.footer-tools{display:flex; flex-direction:column; align-items:center; gap:8px; padding-top:32px}
+.export-link.quiet{border-color:transparent; font-weight:500}
+.photo-card img.loading{animation:shimmer 1.2s ease-in-out infinite}
+@keyframes shimmer{0%,100%{opacity:.35} 50%{opacity:.6}}
+</style>
+</head>
+<body>
 <div class="bg-layer" aria-hidden="true">
   <span class="bg-flag bg-in" data-flag="in"></span>
   <span class="bg-flag bg-sv" data-flag="sv"></span>
@@ -425,12 +475,43 @@ h1 span{text-shadow:0 0 22px rgba(0,175,240,.35)}
     </div>
   </header>
 
-  <div class="day-nav" id="day-nav" hidden></div>
+  <!-- signed out -->
+  <div class="gate" id="gate-signin" hidden>
+    <p class="gate-title">just for the two of us</p>
+    <p class="gate-sub">sign in to see our photos.</p>
+    <button type="button" class="btn google-btn" id="signin-btn">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+      Sign in with Google
+    </button>
+    <p class="form-error" id="signin-error" hidden></p>
+  </div>
 
-  <p class="state-msg" id="loading-state">catching up on today…</p>
-  <p class="state-msg" id="empty-state" hidden>the first photos are on their way.</p>
-  <div class="feed" id="feed" hidden></div>
-  <p class="share-note" id="share-note" hidden>only people this is shared with (signed in to Claude) can add photos here.</p>
+  <!-- signed in, not on the list -->
+  <div class="gate" id="gate-denied" hidden>
+    <p class="gate-title">this one's private</p>
+    <p class="gate-sub" id="denied-msg">this account isn't one of the two that can open OnlyUs.</p>
+    <button type="button" class="btn ghost" id="denied-signout">Use a different account</button>
+  </div>
+
+  <!-- Firebase not set up yet -->
+  <div class="gate" id="gate-setup" hidden>
+    <p class="gate-title">almost there</p>
+    <p class="gate-sub">OnlyUs isn't connected to its Firebase project yet. Paste the project's config into <code>firebase-config.js</code>.</p>
+  </div>
+
+  <div id="app" hidden>
+    <div class="day-nav" id="day-nav" hidden></div>
+    <p class="state-msg" id="loading-state">catching up on today…</p>
+    <p class="state-msg" id="empty-state" hidden>the first photos are on their way.</p>
+    <div class="feed" id="feed" hidden></div>
+
+    <div class="footer-tools">
+      <button type="button" class="export-link" id="import-btn">Import photos from Claude (.zip)</button>
+      <input type="file" id="import-file" accept=".zip,application/zip" hidden>
+      <span class="export-status" id="import-status" hidden></span>
+      <button type="button" class="export-link quiet" id="signout-btn">Sign out</button>
+    </div>
+  </div>
 </div>
 
 <button id="add-btn" type="button" aria-label="Add today's photo" hidden>+</button>
@@ -475,7 +556,7 @@ h1 span{text-shadow:0 0 22px rgba(0,175,240,.35)}
       </div>
       <button type="button" class="btn danger" id="remove-btn">Remove photo</button>
       <div class="confirm-box" id="confirm-box" hidden>
-        <p>Remove this photo from Us, Daily? This can't be undone.</p>
+        <p>Remove this photo from OnlyUs? This can't be undone.</p>
         <div class="btn-row">
           <button type="button" class="btn ghost" id="confirm-no">Keep it</button>
           <button type="button" class="btn danger solid" id="confirm-yes">Remove</button>
@@ -484,364 +565,6 @@ h1 span{text-shadow:0 0 22px rgba(0,175,240,.35)}
     </form>
   </div>
 </div>
-
-<script>
-(async function(){
-  "use strict";
-  var feedEl = document.getElementById("feed");
-  var dayNavEl = document.getElementById("day-nav");
-  var emptyEl = document.getElementById("empty-state");
-  var loadingEl = document.getElementById("loading-state");
-  var shareNoteEl = document.getElementById("share-note");
-  var addBtn = document.getElementById("add-btn");
-
-  var panel = document.getElementById("add-panel");
-  var form = document.getElementById("add-form");
-  var fileInput = document.getElementById("photo-file");
-  var addPreview = document.getElementById("add-preview");
-  var captionInput = document.getElementById("photo-caption");
-  var cancelBtn = document.getElementById("cancel-btn");
-  var formError = document.getElementById("form-error");
-  var submitBtn = document.getElementById("submit-btn");
-
-  var editPanel = document.getElementById("edit-panel");
-  var editForm = document.getElementById("edit-form");
-  var editPreview = document.getElementById("edit-preview");
-  var editCaption = document.getElementById("edit-caption");
-  var editError = document.getElementById("edit-error");
-  var editCancel = document.getElementById("edit-cancel");
-  var editSave = document.getElementById("edit-save");
-  var removeBtn = document.getElementById("remove-btn");
-  var confirmBox = document.getElementById("confirm-box");
-  var confirmNo = document.getElementById("confirm-no");
-  var confirmYes = document.getElementById("confirm-yes");
-
-  var assetsNs = null, dbNs = null, userNs = null;
-  var myId = null;
-  var canWrite = false;
-  var loadTimer = null;
-  var editing = null;      // { id, assetId, caption }
-  var freshId = null;      // doc id of the photo just added, for the pop-in
-  var previewUrl = null;
-
-  /* ---------- flags ---------- */
-  function indiaFlag(){
-    var spokes = "";
-    for (var i = 0; i < 24; i++){
-      spokes += '<line x1="450" y1="300" x2="450" y2="210" transform="rotate(' + (i * 15) + ' 450 300)"/>';
-    }
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">' +
-      '<rect width="900" height="200" fill="#FF9933"/>' +
-      '<rect y="200" width="900" height="200" fill="#FFFFFF"/>' +
-      '<rect y="400" width="900" height="200" fill="#138808"/>' +
-      '<g stroke="#000080" fill="none">' +
-        '<circle cx="450" cy="300" r="88" stroke-width="8"/>' +
-        '<g stroke-width="3.5">' + spokes + '</g>' +
-      '</g>' +
-      '<circle cx="450" cy="300" r="16" fill="#000080"/>' +
-    '</svg>';
-  }
-  function salvadorFlag(){
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 507">' +
-      '<rect width="900" height="169" fill="#0F47AF"/>' +
-      '<rect y="169" width="900" height="169" fill="#FFFFFF"/>' +
-      '<rect y="338" width="900" height="169" fill="#0F47AF"/>' +
-      '<text x="450" y="268" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="52" letter-spacing="4" fill="#C9A227">DIOS UNIÓN LIBERTAD</text>' +
-    '</svg>';
-  }
-  Array.prototype.forEach.call(document.querySelectorAll("[data-flag]"), function(el){
-    el.innerHTML = el.getAttribute("data-flag") === "in" ? indiaFlag() : salvadorFlag();
-  });
-
-  var PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
-
-  function pad(n){ return n < 10 ? "0" + n : "" + n; }
-  function ymd(d){ return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
-  function todayStr(){ return ymd(new Date()); }
-  function dayLabel(dateStr){
-    if (dateStr === todayStr()) return "Today";
-    var y = new Date(); y.setDate(y.getDate() - 1);
-    if (dateStr === ymd(y)) return "Yesterday";
-    var parts = dateStr.split("-").map(Number);
-    var d = new Date(parts[0], parts[1] - 1, parts[2]);
-    return d.toLocaleDateString(undefined, { month: "long", day: "numeric", year: d.getFullYear() === new Date().getFullYear() ? undefined : "numeric" });
-  }
-  function dayDomId(dateStr){ return "day-" + dateStr.replace(/[^0-9]/g, ""); }
-  function clearLoadTimer(){ if (loadTimer){ clearTimeout(loadTimer); loadTimer = null; } }
-
-  async function renderEntries(docs){
-    clearLoadTimer();
-    loadingEl.hidden = true;
-
-    var items = (docs || []).map(function(d){
-      var x = d.data() || {};
-      return { id: d.id, assetId: x.assetId, caption: x.caption || "", date: x.date || todayStr(), addedBy: x.addedBy || null, addedAt: Number(x.addedAt) || 0 };
-    }).filter(function(x){ return x.assetId; });
-
-    if (items.length === 0){
-      emptyEl.hidden = false;
-      emptyEl.textContent = "the first photos are on their way.";
-      feedEl.hidden = true;
-      dayNavEl.hidden = true;
-      feedEl.innerHTML = "";
-      return;
-    }
-    emptyEl.hidden = true;
-    feedEl.hidden = false;
-
-    // Newest first, always — newest day on top, newest photo first within it.
-    items.sort(function(a, b){
-      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
-      return b.addedAt - a.addedAt;
-    });
-
-    var ids = Array.from(new Set(items.map(function(x){ return x.addedBy; }).filter(Boolean)));
-    var profiles = {};
-    if (userNs && ids.length){
-      try { profiles = await userNs.profiles(ids); } catch (e) { profiles = {}; }
-    }
-
-    var groups = {}, order = [];
-    items.forEach(function(it){
-      if (!groups[it.date]){ groups[it.date] = []; order.push(it.date); }
-      groups[it.date].push(it);
-    });
-
-    feedEl.innerHTML = "";
-    dayNavEl.innerHTML = "";
-    dayNavEl.hidden = order.length < 2;
-
-    order.forEach(function(day){
-      var domId = dayDomId(day);
-
-      var chip = document.createElement("button");
-      chip.type = "button";
-      chip.className = "day-chip";
-      chip.textContent = dayLabel(day);
-      chip.addEventListener("click", function(){
-        var target = document.getElementById(domId);
-        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-      dayNavEl.appendChild(chip);
-
-      var section = document.createElement("div");
-      section.className = "day-section";
-      section.id = domId;
-      var heading = document.createElement("div");
-      heading.className = "day-heading";
-      var hl = document.createElement("span"); hl.textContent = dayLabel(day);
-      var hc = document.createElement("span"); hc.className = "count";
-      hc.textContent = groups[day].length + (groups[day].length === 1 ? " photo" : " photos");
-      heading.appendChild(hl); heading.appendChild(hc);
-      section.appendChild(heading);
-
-      var row = document.createElement("div");
-      row.className = "day-photos";
-      groups[day].forEach(function(it){
-        var fig = document.createElement("figure");
-        fig.className = "photo-card" + (canWrite ? " editable" : "") + (it.id === freshId ? " fresh" : "");
-        var img = document.createElement("img");
-        img.src = "/_blob/" + it.assetId;
-        img.loading = "lazy";
-        img.alt = it.caption || "a photo of us";
-        fig.appendChild(img);
-        if (it.caption){
-          var cap = document.createElement("figcaption");
-          cap.textContent = it.caption;
-          fig.appendChild(cap);
-        }
-        var byName = (it.addedBy && profiles[it.addedBy] && profiles[it.addedBy].name) || "";
-        if (myId && it.addedBy === myId) byName = "you";
-        var by = document.createElement("span");
-        by.className = "by";
-        by.textContent = byName || "us";
-        fig.appendChild(by);
-
-        if (canWrite){
-          var eb = document.createElement("button");
-          eb.type = "button";
-          eb.className = "edit-badge";
-          eb.setAttribute("aria-label", "Edit or remove this photo");
-          eb.innerHTML = PENCIL;
-          eb.addEventListener("click", function(e){ e.stopPropagation(); openEdit(it); });
-          fig.appendChild(eb);
-          fig.addEventListener("click", function(){ openEdit(it); });
-        }
-        row.appendChild(fig);
-      });
-      section.appendChild(row);
-      feedEl.appendChild(section);
-    });
-    freshId = null;
-  }
-
-  /* ---------- add ---------- */
-  function clearPreview(){
-    if (previewUrl){ URL.revokeObjectURL(previewUrl); previewUrl = null; }
-    addPreview.hidden = true;
-    addPreview.removeAttribute("src");
-  }
-  function openPanel(){
-    form.reset();
-    clearPreview();
-    formError.hidden = true;
-    panel.hidden = false;
-  }
-  function closePanel(){ panel.hidden = true; clearPreview(); }
-
-  fileInput.addEventListener("change", function(){
-    clearPreview();
-    var f = fileInput.files && fileInput.files[0];
-    if (f){ previewUrl = URL.createObjectURL(f); addPreview.src = previewUrl; addPreview.hidden = false; }
-  });
-  addBtn.addEventListener("click", openPanel);
-  cancelBtn.addEventListener("click", closePanel);
-  panel.addEventListener("click", function(e){ if (e.target === panel) closePanel(); });
-
-  form.addEventListener("submit", async function(e){
-    e.preventDefault();
-    if (!assetsNs || !dbNs) return;
-    var file = fileInput.files && fileInput.files[0];
-    if (!file){
-      formError.textContent = "Pick a photo first.";
-      formError.hidden = false;
-      return;
-    }
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Adding…";
-    formError.hidden = true;
-    try {
-      var result = await assetsNs.upload(file);
-      var who = myId;
-      if (!who && userNs){ try { who = await userNs.id(); } catch (e2) {} }
-      var ref = await dbNs.collection("entries").add({
-        assetId: result.id,
-        caption: captionInput.value.trim(),
-        date: todayStr(),
-        addedBy: who || null,
-        addedAt: Date.now()
-      });
-      if (ref && ref.id) freshId = ref.id;
-      closePanel();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      formError.textContent = "That didn't go through — try again.";
-      formError.hidden = false;
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Add it";
-    }
-  });
-
-  /* ---------- edit / remove ---------- */
-  function openEdit(it){
-    if (!dbNs) return;
-    editing = it;
-    editPreview.src = "/_blob/" + it.assetId;
-    editPreview.alt = it.caption || "a photo of us";
-    editCaption.value = it.caption || "";
-    editError.hidden = true;
-    confirmBox.hidden = true;
-    removeBtn.hidden = false;
-    editPanel.hidden = false;
-  }
-  function closeEdit(){ editPanel.hidden = true; editing = null; }
-
-  editCancel.addEventListener("click", closeEdit);
-  editPanel.addEventListener("click", function(e){ if (e.target === editPanel) closeEdit(); });
-  document.addEventListener("keydown", function(e){
-    if (e.key !== "Escape") return;
-    if (!editPanel.hidden) closeEdit();
-    else if (!panel.hidden) closePanel();
-  });
-
-  editForm.addEventListener("submit", async function(e){
-    e.preventDefault();
-    if (!editing) return;
-    var next = editCaption.value.trim();
-    if (next === (editing.caption || "")){ closeEdit(); return; }
-    editSave.disabled = true;
-    editSave.textContent = "Saving…";
-    editError.hidden = true;
-    try {
-      await dbNs.collection("entries").doc(editing.id).update({ caption: next });
-      closeEdit();
-    } catch (err) {
-      editError.textContent = "Couldn't save that — try again.";
-      editError.hidden = false;
-    } finally {
-      editSave.disabled = false;
-      editSave.textContent = "Save";
-    }
-  });
-
-  removeBtn.addEventListener("click", function(){
-    removeBtn.hidden = true;
-    confirmBox.hidden = false;
-  });
-  confirmNo.addEventListener("click", function(){
-    confirmBox.hidden = true;
-    removeBtn.hidden = false;
-  });
-  confirmYes.addEventListener("click", async function(){
-    if (!editing) return;
-    var target = editing;
-    confirmYes.disabled = true;
-    confirmYes.textContent = "Removing…";
-    editError.hidden = true;
-    try {
-      await dbNs.collection("entries").doc(target.id).delete();
-      // Best-effort cleanup of the stored image; the photo is already gone from the log.
-      if (assetsNs && target.assetId){
-        try { await assetsNs.delete(target.assetId); } catch (e3) {}
-      }
-      closeEdit();
-    } catch (err) {
-      editError.textContent = "Couldn't remove that — try again.";
-      editError.hidden = false;
-    } finally {
-      confirmYes.disabled = false;
-      confirmYes.textContent = "Remove";
-    }
-  });
-
-  /* ---------- boot ---------- */
-  loadTimer = setTimeout(function(){
-    if (!loadingEl.hidden){ loadingEl.textContent = "still catching up — hang tight."; }
-  }, 10000);
-
-  try { dbNs = (window.claude && window.claude.use) ? await window.claude.use("db") : null; } catch (e) { dbNs = null; }
-  try { assetsNs = (window.claude && window.claude.use) ? await window.claude.use("assets") : null; } catch (e) { assetsNs = null; }
-  try { userNs = (window.claude && window.claude.use) ? await window.claude.use("user") : null; } catch (e) { userNs = null; }
-  if (userNs){ try { myId = await userNs.id(); } catch (e) { myId = null; } }
-
-  // Show edit controls to anyone who may write the shared log (unknown = assume yes; a refused write shows an error).
-  if (dbNs){
-    var w = null;
-    try { w = userNs && userNs.can ? await userNs.can("data.write") : null; } catch (e) { w = null; }
-    canWrite = w !== false;
-  }
-
-  if (assetsNs){ addBtn.hidden = false; }
-  else { shareNoteEl.hidden = false; }
-
-  if (dbNs){
-    dbNs.collection("entries").orderBy("addedAt", "desc").onSnapshot(
-      function(snap){ renderEntries(snap.docs); },
-      function(){
-        clearLoadTimer();
-        loadingEl.hidden = true;
-        emptyEl.hidden = false;
-        emptyEl.textContent = "couldn't load the photos right now.";
-      }
-    );
-  } else {
-    clearLoadTimer();
-    loadingEl.hidden = true;
-    emptyEl.hidden = false;
-  }
-})();
-</script>
-
+<script type="module" src="app.js"></script>
 </body>
 </html>

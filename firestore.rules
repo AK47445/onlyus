@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Only these two Google accounts can see or change anything.
+    // Replace the two emails below in the Firebase console (Firestore → Rules) and Publish.
+    function isUs() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() in ['your-email@gmail.com', 'her-email@gmail.com'];
+    }
+    match /entries/{id} {
+      allow read, write: if isUs();
+    }
+    match /images/{id} {
+      allow read, delete: if isUs();
+      allow create, update: if isUs() && request.resource.data.data is string;
+    }
+  }
+}
