@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="OnlyUs">
+</head>
+<body>
+<title>OnlyUs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{
+  /* India x El Salvador: saffron + green from the tiranga, cobalt blue + white from la azul y blanco */
+  --bg:#070b1a;
+  --bg-panel:#0e1530;
+  --bg-panel-2:#141d3c;
+  --fg:#f3f6ff;
+  --muted:#8e9bbd;
+  --pink:#ff9933;
+  --violet:#2563eb;
+  --mint:#34c46a;
+  --danger:#ff5a6e;
+  --line:#223058;
+  --sv-blue:#0f47af;
+  --in-green:#138808;
+  --font-display:'Bricolage Grotesque', 'Figtree', system-ui, sans-serif;
+  --font-body:'Figtree', system-ui, -apple-system, sans-serif;
+  --font-hand:'Permanent Marker', cursive;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--font-body);
+  min-height:100%;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+  overflow-x:hidden;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0 0 auto;
+  height:env(safe-area-inset-top,0px);
+  background:var(--bg);
+  z-index:20;
+}
+h1{font-family:var(--font-display); text-wrap:balance; margin:0}
+p{margin:0}
+button{font-family:var(--font-body)}
+[hidden]{display:none !important}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important}
+}
+
+.wrap{
+  max-width:640px;
+  margin:0 auto;
+  padding-top:calc(20px + env(safe-area-inset-top,0px));
+  padding-bottom:calc(100px + env(safe-area-inset-bottom,0px));
+  min-height:100%;
+  position:relative;
+}
+
+/* ---- India x El Salvador backdrop ---- */
+.bg-layer{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(60% 45% at 0% 0%, rgba(255,153,51,.22) 0%, transparent 70%),
+    radial-gradient(55% 45% at 0% 100%, rgba(19,136,8,.24) 0%, transparent 70%),
+    radial-gradient(60% 50% at 100% 10%, rgba(15,71,175,.38) 0%, transparent 70%),
+    radial-gradient(55% 45% at 100% 95%, rgba(15,71,175,.28) 0%, transparent 70%),
+    radial-gradient(40% 30% at 50% 50%, rgba(255,255,255,.04) 0%, transparent 70%),
+    var(--bg);
+}
+.bg-layer::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(135deg, rgba(255,255,255,.018) 0 2px, transparent 2px 14px);
+}
+body{background:transparent}
+html{background:var(--bg)}
+.flags{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-top:12px;
+}
+.flag{display:block; line-height:0}
+.flag svg{
+  height:44px;
+  width:auto;
+  display:block;
+  border-radius:4px;
+  box-shadow:0 6px 18px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.12);
+  transform-origin:left center;
+  animation:wave 4s ease-in-out infinite;
+}
+.flag[data-flag="sv"] svg{animation-delay:-2s}
+@keyframes wave{
+  0%,100%{ transform:perspective(300px) rotateY(0deg) skewY(0deg); }
+  50%{ transform:perspective(300px) rotateY(-8deg) skewY(-1.5deg); }
+}
+.flags .heart{color:#ff2a3d; font-size:1.3rem; line-height:1; text-shadow:0 0 12px rgba(255,42,61,.6)}
+.bg-flag{position:absolute; line-height:0; opacity:.09; filter:blur(.5px)}
+.bg-flag svg{width:100%; height:auto; display:block}
+.bg-in{width:min(70vw, 520px); top:6%; left:-14%; transform:rotate(-12deg)}
+.bg-sv{width:min(70vw, 520px); bottom:4%; right:-14%; transform:rotate(10deg)}
+
+/* ---- glow header ---- */
+header{
+  position:relative;
+  text-align:center;
+  padding:18px 8px 26px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  align-items:center;
+  overflow:hidden;
+  border-radius:20px;
+  isolation:isolate;
+}
+header::before{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  z-index:-1;
+  background:
+    radial-gradient(circle at 18% 25%, rgba(255,153,51,.45) 0%, transparent 42%),
+    radial-gradient(circle at 82% 20%, rgba(15,71,175,.6) 0%, transparent 45%),
+    radial-gradient(circle at 50% 95%, rgba(19,136,8,.4) 0%, transparent 42%);
+  filter:blur(34px);
+  opacity:.55;
+  animation:drift 14s ease-in-out infinite alternate;
+}
+@keyframes drift{
+  0%{ transform: translate(-2%, -1%) scale(1); }
+  100%{ transform: translate(3%, 2%) scale(1.08); }
+}
+.eyebrow{
+  font-family:var(--font-hand);
+  color:#ffb366;
+  font-size:1.15rem;
+  letter-spacing:.01em;
+}
+h1{
+  font-size:clamp(2.6rem,11vw,3.6rem);
+  font-weight:800;
+  letter-spacing:-.02em;
+  line-height:1;
+}
+h1 .t-only{color:#2fb8f5}
+h1 .t-us{color:#0a8fd8}
+h1 span{text-shadow:0 0 22px rgba(0,175,240,.35)}
+.sub{color:var(--muted); font-size:.95rem; max-width:38ch}
+
+/* ---- day chip nav ---- */
+.day-nav{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:18px 2px 4px;
+  scrollbar-width:none;
+}
+.day-nav::-webkit-scrollbar{display:none}
+.day-chip{
+  flex:none;
+  font-size:.82rem;
+  font-weight:600;
+  color:var(--fg);
+  background:var(--bg-panel-2);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:7px 14px;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:border-color .15s, transform .15s;
+}
+.day-chip:hover{border-color:var(--pink); transform:translateY(-1px)}
+.day-chip:active{transform:scale(.96)}
+
+/* ---- daily feed ---- */
+.feed{display:flex; flex-direction:column; gap:30px; margin-top:8px}
+.day-section{display:flex; flex-direction:column; gap:10px; scroll-margin-top:16px}
+.day-heading{
+  font-family:var(--font-hand);
+  font-size:1.4rem;
+  color:var(--pink);
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+.day-heading .count{font-family:var(--font-body); font-size:.75rem; font-weight:600; color:var(--muted)}
+.day-photos{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px}
+@media (min-width:520px){ .day-photos{grid-template-columns:repeat(3, minmax(0,1fr))} }
+.photo-card{
+  position:relative;
+  min-width:0;
+  margin:0;
+  background:var(--bg-panel-2);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:7px 7px 9px;
+  transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.photo-card.editable{cursor:pointer}
+.photo-card:hover{
+  transform:translateY(-3px) scale(1.02);
+  border-color:color-mix(in srgb, var(--violet) 60%, var(--line));
+  box-shadow:0 0 0 1px color-mix(in srgb, var(--pink) 40%, transparent), 0 14px 30px rgba(0,0,0,.5), 0 0 24px color-mix(in srgb, var(--violet) 35%, transparent);
+}
+.photo-card.fresh{animation:pop-in .5s ease-out}
+@keyframes pop-in{
+  0%{ transform:scale(.85); opacity:0; box-shadow:0 0 30px var(--mint); }
+  100%{ transform:scale(1); opacity:1; }
+}
+.photo-card img{
+  width:100%;
+  aspect-ratio:4/5;
+  object-fit:cover;
+  border-radius:9px;
+  display:block;
+  background:var(--bg);
+}
+.photo-card figcaption{
+  margin-top:8px;
+  font-family:var(--font-hand);
+  font-size:1rem;
+  color:var(--fg);
+  text-align:center;
+  line-height:1.25;
+}
+.photo-card .by{
+  display:block;
+  margin-top:3px;
+  font-size:.68rem;
+  font-weight:600;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--mint);
+  text-align:center;
+}
+.edit-badge{
+  position:absolute;
+  top:13px;
+  right:13px;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  border:none;
+  background:rgba(10,6,18,.72);
+  backdrop-filter:blur(4px);
+  color:var(--fg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  padding:0;
+  transition:background .15s, transform .15s;
+}
+.edit-badge:hover{background:var(--violet); transform:scale(1.08)}
+.edit-badge:focus-visible{outline:2px solid var(--mint); outline-offset:2px}
+.edit-badge svg{width:15px; height:15px}
+
+.state-msg{
+  text-align:center;
+  color:var(--muted);
+  font-family:var(--font-display);
+  font-weight:600;
+  padding:48px 16px;
+}
+.share-note{
+  text-align:center;
+  color:var(--muted);
+  font-size:.82rem;
+  padding:16px 10px 0;
+}
+
+/* ---- floating add button ---- */
+#add-btn{
+  position:fixed;
+  right:max(18px, calc(env(safe-area-inset-right,0px) + 10px));
+  bottom:max(18px, calc(env(safe-area-inset-bottom,0px) + 10px));
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:linear-gradient(135deg, var(--pink), var(--violet));
+  color:#fff;
+  border:none;
+  font-size:1.9rem;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  z-index:30;
+  animation:pulse-glow 2.6s ease-in-out infinite;
+  transition:transform .15s;
+}
+@keyframes pulse-glow{
+  0%,100%{ box-shadow:0 8px 20px rgba(0,0,0,.5), 0 0 0 0 color-mix(in srgb, var(--pink) 45%, transparent); }
+  50%{ box-shadow:0 8px 20px rgba(0,0,0,.5), 0 0 18px 6px color-mix(in srgb, var(--violet) 40%, transparent); }
+}
+#add-btn:hover{transform:scale(1.08) rotate(90deg)}
+#add-btn:active{transform:scale(.95)}
+#add-btn:focus-visible{outline:3px solid var(--mint); outline-offset:3px}
+
+/* ---- sheets (add + edit) ---- */
+.sheet{
+  position:fixed;
+  inset:0;
+  background:rgba(5,2,10,.78);
+  backdrop-filter:blur(2px);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:40;
+  padding:16px;
+  padding-bottom:max(16px, env(safe-area-inset-bottom,0px));
+}
+@media (min-width:560px){ .sheet{align-items:center} }
+.sheet .card{
+  background:var(--bg-panel);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:20px;
+  width:100%;
+  max-width:420px;
+  max-height:calc(100dvh - 32px);
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  box-shadow:0 0 40px color-mix(in srgb, var(--violet) 25%, transparent);
+}
+.sheet h2{font-family:var(--font-display); font-weight:700; font-size:1.3rem; margin:0; color:var(--fg)}
+.sheet form{display:flex; flex-direction:column; gap:12px}
+.sheet label{font-size:.85rem; color:var(--muted); display:flex; flex-direction:column; gap:6px}
+.sheet input[type="file"],
+.sheet input[type="text"]{
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--fg);
+  background:var(--bg-panel-2);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px 12px;
+  width:100%;
+}
+.sheet input[type="text"]:focus{outline:none; border-color:var(--violet)}
+.sheet input[type="text"]::placeholder{color:var(--muted)}
+.preview{
+  width:100%;
+  max-height:min(260px, 32vh);
+  object-fit:contain;
+  border-radius:10px;
+  background:var(--bg);
+  display:block;
+}
+.btn-row{display:flex; gap:8px}
+.btn{
+  appearance:none;
+  border:none;
+  background:linear-gradient(135deg, var(--pink), var(--violet));
+  color:#fff;
+  font-weight:700;
+  font-size:.95rem;
+  padding:12px 18px;
+  border-radius:999px;
+  cursor:pointer;
+  width:100%;
+  transition:transform .15s, filter .15s;
+}
+.btn:hover{filter:brightness(1.1)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.6; cursor:default}
+.btn.ghost{
+  background:transparent;
+  color:var(--fg);
+  border:1px solid var(--line);
+  font-weight:600;
+}
+.btn.danger{
+  background:transparent;
+  color:var(--danger);
+  border:1px solid color-mix(in srgb, var(--danger) 45%, var(--line));
+  font-weight:600;
+}
+.btn.danger.solid{background:var(--danger); color:#fff; border-color:var(--danger)}
+.confirm-box{
+  border:1px solid color-mix(in srgb, var(--danger) 45%, var(--line));
+  background:color-mix(in srgb, var(--danger) 8%, var(--bg-panel));
+  border-radius:12px;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.confirm-box p{font-size:.9rem; color:var(--fg)}
+.form-error{color:var(--pink); font-size:.88rem}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Figtree:wght@400;500;600;700&family=Permanent+Marker&display=swap">
+
+<div class="bg-layer" aria-hidden="true">
+  <span class="bg-flag bg-in" data-flag="in"></span>
+  <span class="bg-flag bg-sv" data-flag="sv"></span>
+</div>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">started june 17th · downtown dallas</p>
+    <h1><span class="t-only">Only</span><span class="t-us">Us</span></h1>
+    <p class="sub">one photo at a time — whatever we're up to, whenever we're up to it.</p>
+    <div class="flags">
+      <span class="flag" data-flag="in" role="img" aria-label="Flag of India"></span>
+      <span class="heart" aria-hidden="true">♥</span>
+      <span class="flag" data-flag="sv" role="img" aria-label="Flag of El Salvador"></span>
+    </div>
+  </header>
+
+  <div class="day-nav" id="day-nav" hidden></div>
+
+  <p class="state-msg" id="loading-state">catching up on today…</p>
+  <p class="state-msg" id="empty-state" hidden>the first photos are on their way.</p>
+  <div class="feed" id="feed" hidden></div>
+  <p class="share-note" id="share-note" hidden>only people this is shared with (signed in to Claude) can add photos here.</p>
+</div>
+
+<button id="add-btn" type="button" aria-label="Add today's photo" hidden>+</button>
+
+<!-- add sheet -->
+<div id="add-panel" class="sheet" hidden>
+  <div class="card">
+    <h2>Add today's photo</h2>
+    <form id="add-form">
+      <label>
+        Photo
+        <input type="file" id="photo-file" accept="image/*" required>
+      </label>
+      <img class="preview" id="add-preview" alt="" hidden>
+      <label>
+        Caption (optional)
+        <input type="text" id="photo-caption" placeholder="what are we doing" maxlength="120">
+      </label>
+      <p class="form-error" id="form-error" hidden></p>
+      <div class="btn-row">
+        <button type="button" class="btn ghost" id="cancel-btn">Cancel</button>
+        <button type="submit" class="btn" id="submit-btn">Add it</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- edit sheet -->
+<div id="edit-panel" class="sheet" hidden>
+  <div class="card">
+    <h2>Edit photo</h2>
+    <img class="preview" id="edit-preview" alt="">
+    <form id="edit-form">
+      <label>
+        Caption
+        <input type="text" id="edit-caption" placeholder="what are we doing" maxlength="120">
+      </label>
+      <p class="form-error" id="edit-error" hidden></p>
+      <div class="btn-row">
+        <button type="button" class="btn ghost" id="edit-cancel">Cancel</button>
+        <button type="submit" class="btn" id="edit-save">Save</button>
+      </div>
+      <button type="button" class="btn danger" id="remove-btn">Remove photo</button>
+      <div class="confirm-box" id="confirm-box" hidden>
+        <p>Remove this photo from Us, Daily? This can't be undone.</p>
+        <div class="btn-row">
+          <button type="button" class="btn ghost" id="confirm-no">Keep it</button>
+          <button type="button" class="btn danger solid" id="confirm-yes">Remove</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(async function(){
+  "use strict";
+  var feedEl = document.getElementById("feed");
+  var dayNavEl = document.getElementById("day-nav");
+  var emptyEl = document.getElementById("empty-state");
+  var loadingEl = document.getElementById("loading-state");
+  var shareNoteEl = document.getElementById("share-note");
+  var addBtn = document.getElementById("add-btn");
+
+  var panel = document.getElementById("add-panel");
+  var form = document.getElementById("add-form");
+  var fileInput = document.getElementById("photo-file");
+  var addPreview = document.getElementById("add-preview");
+  var captionInput = document.getElementById("photo-caption");
+  var cancelBtn = document.getElementById("cancel-btn");
+  var formError = document.getElementById("form-error");
+  var submitBtn = document.getElementById("submit-btn");
+
+  var editPanel = document.getElementById("edit-panel");
+  var editForm = document.getElementById("edit-form");
+  var editPreview = document.getElementById("edit-preview");
+  var editCaption = document.getElementById("edit-caption");
+  var editError = document.getElementById("edit-error");
+  var editCancel = document.getElementById("edit-cancel");
+  var editSave = document.getElementById("edit-save");
+  var removeBtn = document.getElementById("remove-btn");
+  var confirmBox = document.getElementById("confirm-box");
+  var confirmNo = document.getElementById("confirm-no");
+  var confirmYes = document.getElementById("confirm-yes");
+
+  var assetsNs = null, dbNs = null, userNs = null;
+  var myId = null;
+  var canWrite = false;
+  var loadTimer = null;
+  var editing = null;      // { id, assetId, caption }
+  var freshId = null;      // doc id of the photo just added, for the pop-in
+  var previewUrl = null;
+
+  /* ---------- flags ---------- */
+  function indiaFlag(){
+    var spokes = "";
+    for (var i = 0; i < 24; i++){
+      spokes += '<line x1="450" y1="300" x2="450" y2="210" transform="rotate(' + (i * 15) + ' 450 300)"/>';
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">' +
+      '<rect width="900" height="200" fill="#FF9933"/>' +
+      '<rect y="200" width="900" height="200" fill="#FFFFFF"/>' +
+      '<rect y="400" width="900" height="200" fill="#138808"/>' +
+      '<g stroke="#000080" fill="none">' +
+        '<circle cx="450" cy="300" r="88" stroke-width="8"/>' +
+        '<g stroke-width="3.5">' + spokes + '</g>' +
+      '</g>' +
+      '<circle cx="450" cy="300" r="16" fill="#000080"/>' +
+    '</svg>';
+  }
+  function salvadorFlag(){
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 507">' +
+      '<rect width="900" height="169" fill="#0F47AF"/>' +
+      '<rect y="169" width="900" height="169" fill="#FFFFFF"/>' +
+      '<rect y="338" width="900" height="169" fill="#0F47AF"/>' +
+      '<text x="450" y="268" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="52" letter-spacing="4" fill="#C9A227">DIOS UNIÓN LIBERTAD</text>' +
+    '</svg>';
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-flag]"), function(el){
+    el.innerHTML = el.getAttribute("data-flag") === "in" ? indiaFlag() : salvadorFlag();
+  });
+
+  var PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+
+  function pad(n){ return n < 10 ? "0" + n : "" + n; }
+  function ymd(d){ return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function todayStr(){ return ymd(new Date()); }
+  function dayLabel(dateStr){
+    if (dateStr === todayStr()) return "Today";
+    var y = new Date(); y.setDate(y.getDate() - 1);
+    if (dateStr === ymd(y)) return "Yesterday";
+    var parts = dateStr.split("-").map(Number);
+    var d = new Date(parts[0], parts[1] - 1, parts[2]);
+    return d.toLocaleDateString(undefined, { month: "long", day: "numeric", year: d.getFullYear() === new Date().getFullYear() ? undefined : "numeric" });
+  }
+  function dayDomId(dateStr){ return "day-" + dateStr.replace(/[^0-9]/g, ""); }
+  function clearLoadTimer(){ if (loadTimer){ clearTimeout(loadTimer); loadTimer = null; } }
+
+  async function renderEntries(docs){
+    clearLoadTimer();
+    loadingEl.hidden = true;
+
+    var items = (docs || []).map(function(d){
+      var x = d.data() || {};
+      return { id: d.id, assetId: x.assetId, caption: x.caption || "", date: x.date || todayStr(), addedBy: x.addedBy || null, addedAt: Number(x.addedAt) || 0 };
+    }).filter(function(x){ return x.assetId; });
+
+    if (items.length === 0){
+      emptyEl.hidden = false;
+      emptyEl.textContent = "the first photos are on their way.";
+      feedEl.hidden = true;
+      dayNavEl.hidden = true;
+      feedEl.innerHTML = "";
+      return;
+    }
+    emptyEl.hidden = true;
+    feedEl.hidden = false;
+
+    // Newest first, always — newest day on top, newest photo first within it.
+    items.sort(function(a, b){
+      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+      return b.addedAt - a.addedAt;
+    });
+
+    var ids = Array.from(new Set(items.map(function(x){ return x.addedBy; }).filter(Boolean)));
+    var profiles = {};
+    if (userNs && ids.length){
+      try { profiles = await userNs.profiles(ids); } catch (e) { profiles = {}; }
+    }
+
+    var groups = {}, order = [];
+    items.forEach(function(it){
+      if (!groups[it.date]){ groups[it.date] = []; order.push(it.date); }
+      groups[it.date].push(it);
+    });
+
+    feedEl.innerHTML = "";
+    dayNavEl.innerHTML = "";
+    dayNavEl.hidden = order.length < 2;
+
+    order.forEach(function(day){
+      var domId = dayDomId(day);
+
+      var chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "day-chip";
+      chip.textContent = dayLabel(day);
+      chip.addEventListener("click", function(){
+        var target = document.getElementById(domId);
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      dayNavEl.appendChild(chip);
+
+      var section = document.createElement("div");
+      section.className = "day-section";
+      section.id = domId;
+      var heading = document.createElement("div");
+      heading.className = "day-heading";
+      var hl = document.createElement("span"); hl.textContent = dayLabel(day);
+      var hc = document.createElement("span"); hc.className = "count";
+      hc.textContent = groups[day].length + (groups[day].length === 1 ? " photo" : " photos");
+      heading.appendChild(hl); heading.appendChild(hc);
+      section.appendChild(heading);
+
+      var row = document.createElement("div");
+      row.className = "day-photos";
+      groups[day].forEach(function(it){
+        var fig = document.createElement("figure");
+        fig.className = "photo-card" + (canWrite ? " editable" : "") + (it.id === freshId ? " fresh" : "");
+        var img = document.createElement("img");
+        img.src = "/_blob/" + it.assetId;
+        img.loading = "lazy";
+        img.alt = it.caption || "a photo of us";
+        fig.appendChild(img);
+        if (it.caption){
+          var cap = document.createElement("figcaption");
+          cap.textContent = it.caption;
+          fig.appendChild(cap);
+        }
+        var byName = (it.addedBy && profiles[it.addedBy] && profiles[it.addedBy].name) || "";
+        if (myId && it.addedBy === myId) byName = "you";
+        var by = document.createElement("span");
+        by.className = "by";
+        by.textContent = byName || "us";
+        fig.appendChild(by);
+
+        if (canWrite){
+          var eb = document.createElement("button");
+          eb.type = "button";
+          eb.className = "edit-badge";
+          eb.setAttribute("aria-label", "Edit or remove this photo");
+          eb.innerHTML = PENCIL;
+          eb.addEventListener("click", function(e){ e.stopPropagation(); openEdit(it); });
+          fig.appendChild(eb);
+          fig.addEventListener("click", function(){ openEdit(it); });
+        }
+        row.appendChild(fig);
+      });
+      section.appendChild(row);
+      feedEl.appendChild(section);
+    });
+    freshId = null;
+  }
+
+  /* ---------- add ---------- */
+  function clearPreview(){
+    if (previewUrl){ URL.revokeObjectURL(previewUrl); previewUrl = null; }
+    addPreview.hidden = true;
+    addPreview.removeAttribute("src");
+  }
+  function openPanel(){
+    form.reset();
+    clearPreview();
+    formError.hidden = true;
+    panel.hidden = false;
+  }
+  function closePanel(){ panel.hidden = true; clearPreview(); }
+
+  fileInput.addEventListener("change", function(){
+    clearPreview();
+    var f = fileInput.files && fileInput.files[0];
+    if (f){ previewUrl = URL.createObjectURL(f); addPreview.src = previewUrl; addPreview.hidden = false; }
+  });
+  addBtn.addEventListener("click", openPanel);
+  cancelBtn.addEventListener("click", closePanel);
+  panel.addEventListener("click", function(e){ if (e.target === panel) closePanel(); });
+
+  form.addEventListener("submit", async function(e){
+    e.preventDefault();
+    if (!assetsNs || !dbNs) return;
+    var file = fileInput.files && fileInput.files[0];
+    if (!file){
+      formError.textContent = "Pick a photo first.";
+      formError.hidden = false;
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Adding…";
+    formError.hidden = true;
+    try {
+      var result = await assetsNs.upload(file);
+      var who = myId;
+      if (!who && userNs){ try { who = await userNs.id(); } catch (e2) {} }
+      var ref = await dbNs.collection("entries").add({
+        assetId: result.id,
+        caption: captionInput.value.trim(),
+        date: todayStr(),
+        addedBy: who || null,
+        addedAt: Date.now()
+      });
+      if (ref && ref.id) freshId = ref.id;
+      closePanel();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      formError.textContent = "That didn't go through — try again.";
+      formError.hidden = false;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Add it";
+    }
+  });
+
+  /* ---------- edit / remove ---------- */
+  function openEdit(it){
+    if (!dbNs) return;
+    editing = it;
+    editPreview.src = "/_blob/" + it.assetId;
+    editPreview.alt = it.caption || "a photo of us";
+    editCaption.value = it.caption || "";
+    editError.hidden = true;
+    confirmBox.hidden = true;
+    removeBtn.hidden = false;
+    editPanel.hidden = false;
+  }
+  function closeEdit(){ editPanel.hidden = true; editing = null; }
+
+  editCancel.addEventListener("click", closeEdit);
+  editPanel.addEventListener("click", function(e){ if (e.target === editPanel) closeEdit(); });
+  document.addEventListener("keydown", function(e){
+    if (e.key !== "Escape") return;
+    if (!editPanel.hidden) closeEdit();
+    else if (!panel.hidden) closePanel();
+  });
+
+  editForm.addEventListener("submit", async function(e){
+    e.preventDefault();
+    if (!editing) return;
+    var next = editCaption.value.trim();
+    if (next === (editing.caption || "")){ closeEdit(); return; }
+    editSave.disabled = true;
+    editSave.textContent = "Saving…";
+    editError.hidden = true;
+    try {
+      await dbNs.collection("entries").doc(editing.id).update({ caption: next });
+      closeEdit();
+    } catch (err) {
+      editError.textContent = "Couldn't save that — try again.";
+      editError.hidden = false;
+    } finally {
+      editSave.disabled = false;
+      editSave.textContent = "Save";
+    }
+  });
+
+  removeBtn.addEventListener("click", function(){
+    removeBtn.hidden = true;
+    confirmBox.hidden = false;
+  });
+  confirmNo.addEventListener("click", function(){
+    confirmBox.hidden = true;
+    removeBtn.hidden = false;
+  });
+  confirmYes.addEventListener("click", async function(){
+    if (!editing) return;
+    var target = editing;
+    confirmYes.disabled = true;
+    confirmYes.textContent = "Removing…";
+    editError.hidden = true;
+    try {
+      await dbNs.collection("entries").doc(target.id).delete();
+      // Best-effort cleanup of the stored image; the photo is already gone from the log.
+      if (assetsNs && target.assetId){
+        try { await assetsNs.delete(target.assetId); } catch (e3) {}
+      }
+      closeEdit();
+    } catch (err) {
+      editError.textContent = "Couldn't remove that — try again.";
+      editError.hidden = false;
+    } finally {
+      confirmYes.disabled = false;
+      confirmYes.textContent = "Remove";
+    }
+  });
+
+  /* ---------- boot ---------- */
+  loadTimer = setTimeout(function(){
+    if (!loadingEl.hidden){ loadingEl.textContent = "still catching up — hang tight."; }
+  }, 10000);
+
+  try { dbNs = (window.claude && window.claude.use) ? await window.claude.use("db") : null; } catch (e) { dbNs = null; }
+  try { assetsNs = (window.claude && window.claude.use) ? await window.claude.use("assets") : null; } catch (e) { assetsNs = null; }
+  try { userNs = (window.claude && window.claude.use) ? await window.claude.use("user") : null; } catch (e) { userNs = null; }
+  if (userNs){ try { myId = await userNs.id(); } catch (e) { myId = null; } }
+
+  // Show edit controls to anyone who may write the shared log (unknown = assume yes; a refused write shows an error).
+  if (dbNs){
+    var w = null;
+    try { w = userNs && userNs.can ? await userNs.can("data.write") : null; } catch (e) { w = null; }
+    canWrite = w !== false;
+  }
+
+  if (assetsNs){ addBtn.hidden = false; }
+  else { shareNoteEl.hidden = false; }
+
+  if (dbNs){
+    dbNs.collection("entries").orderBy("addedAt", "desc").onSnapshot(
+      function(snap){ renderEntries(snap.docs); },
+      function(){
+        clearLoadTimer();
+        loadingEl.hidden = true;
+        emptyEl.hidden = false;
+        emptyEl.textContent = "couldn't load the photos right now.";
+      }
+    );
+  } else {
+    clearLoadTimer();
+    loadingEl.hidden = true;
+    emptyEl.hidden = false;
+  }
+})();
+</script>
+
+</body>
+</html>
